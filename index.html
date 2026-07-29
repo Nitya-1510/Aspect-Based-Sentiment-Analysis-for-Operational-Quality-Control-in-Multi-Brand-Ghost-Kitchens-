@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Kitchen ABSA Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        textarea { width: 100%; height: 80px; padding: 10px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .card { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 5px; }
+        .alert-high { color: red; font-weight: bold; }
+        .alert-medium { color: orange; font-weight: bold; }
+        .alert-low { color: green; font-weight: bold; }
+        pre { background: #eee; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <h2>Ghost Kitchen ABSA - Live Tester</h2>
+
+    <!-- Form for submitting review -->
+    <div>
+        <label for="reviewInput"><strong>Enter Review Text:</strong></label>
+        <textarea id="reviewInput" placeholder="e.g. The pizza was freezing cold and took 2 hours to arrive!"></textarea>
+        <button onclick="analyzeReview()">Submit & Analyze</button>
+    </div>
+
+    <!-- Live Prediction Card -->
+    <div id="predictionCard" class="card" style="display:none;">
+        <h3>Latest Prediction Result</h3>
+        <p><strong>Predicted Aspect:</strong> <span id="resAspect"></span></p>
+        <p><strong>Confidence Score:</strong> <span id="resConfidence"></span></p>
+        <p><strong>Actionable Alert:</strong> <span id="resAlert"></span></p>
+        <p><strong>Target Department:</strong> <span id="resDept"></span></p>
+        <p><strong>Urgency:</strong> <span id="resUrgency"></span></p>
+        <p><strong>Latency:</strong> <span id="resLatency"></span> ms</p>
+    </div>
+
+    <!-- Dashboard Stats Output -->
+    <div class="card">
+        <h3>Dashboard KPI Stats</h3>
+        <button onclick="fetchDashboardStats()" style="background-color: #007bff;">Refresh Dashboard Stats</button>
+        <pre id="dashboardOutput">Click refresh to load stats...</pre>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        // Endpoint 1: POST /api/analyze
+        async function analyzeReview() {
+            const reviewText = document.getElementById("reviewInput").value.trim();
+            if (!reviewText) return alert("Please enter a review first!");
+
+            try {
+                const response = await fetch(`${API_URL}/api/analyze`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ review: reviewText })
+                });
+
+                const data = await response.json();
+
+                // Display response in UI
+                document.getElementById("predictionCard").style.display = "block";
+                document.getElementById("resAspect").innerText = data.predicted_aspect;
+                document.getElementById("resConfidence").innerText = data.confidence_score;
+                document.getElementById("resAlert").innerText = data.actionable_alert ? "YES" : "NO";
+                document.getElementById("resDept").innerText = data.target_department;
+                document.getElementById("resUrgency").innerText = data.urgency;
+                document.getElementById("resLatency").innerText = data.inference_latency_ms;
+
+                // Color badge based on urgency
+                const urgencyEl = document.getElementById("resUrgency");
+                urgencyEl.className = `alert-${data.urgency.toLowerCase()}`;
+
+                // Auto-refresh dashboard stats
+                fetchDashboardStats();
+            } catch (err) {
+                alert("Error connecting to FastAPI backend!");
+                console.error(err);
+            }
+        }
+
+        // Endpoint 2 & 3: GET /api/dashboard-stats & /api/alerts
+        async function fetchDashboardStats() {
+            try {
+                const statsRes = await fetch(`${API_URL}/api/dashboard-stats`);
+                const statsData = await statsRes.json();
+
+                const alertsRes = await fetch(`${API_URL}/api/alerts`);
+                const alertsData = await alertsRes.json();
+
+                const combined = {
+                    dashboard_stats: statsData,
+                    recent_alerts: alertsData
+                };
+
+                document.getElementById("dashboardOutput").innerText = JSON.stringify(combined, null, 2);
+            } catch (err) {
+                console.error("Failed to load dashboard stats:", err);
+            }
+        }
+    </script>
+</body>
+</html>
