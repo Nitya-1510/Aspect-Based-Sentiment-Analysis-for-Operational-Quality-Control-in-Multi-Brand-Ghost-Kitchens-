@@ -90,6 +90,7 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 15px;
+            width: 100%;
             transition: background 0.2s;
         }
 
@@ -329,9 +330,9 @@
             <div class="brand-version" id="sysVersion">v2.4.1-stable</div>
 
             <nav class="nav-menu">
-                <a class="nav-item active" onclick="switchTab('command')">💻 Command Center</a>
-                <a class="nav-item" onclick="switchTab('inference')">🧪 Inference Lab</a>
-                <a class="nav-item" onclick="switchTab('department')">🏢 Department View</a>
+                <a class="nav-item active">💻 Command Center</a>
+                <a class="nav-item">🧪 Inference Lab</a>
+                <a class="nav-item">🏢 Department View</a>
             </nav>
 
             <button class="btn-new-experiment" onclick="clearInference()">+ New Experiment</button>
@@ -394,7 +395,6 @@
                 <!-- Presets Chips Row -->
                 <div class="presets-bar" id="presetsContainer">
                     <span style="font-size:0.8rem; color: var(--text-secondary);">Presets:</span>
-                    <!-- Preset chips loaded via JavaScript -->
                 </div>
 
                 <!-- Text Area Input -->
@@ -441,16 +441,14 @@
 
     <!-- JavaScript REST Interactivity -->
     <script>
-        const API_BASE = "http://127.0.0.1:8000";
+        const API_BASE = window.location.origin;
 
-        // Initializer on Page Load
         window.addEventListener("DOMContentLoaded", () => {
             fetchSystemStatus();
             fetchPresets();
             refreshDashboardData();
         });
 
-        // 1. Fetch System Status
         async function fetchSystemStatus() {
             try {
                 const res = await fetch(`${API_BASE}/api/system-status`);
@@ -458,11 +456,10 @@
                 document.getElementById("sysStatus").innerText = data.status;
                 document.getElementById("sysVersion").innerText = data.version;
             } catch (e) {
-                console.error("System status endpoint error:", e);
+                console.error("System status error:", e);
             }
         }
 
-        // 2. Fetch Sample Presets
         async function fetchPresets() {
             try {
                 const res = await fetch(`${API_BASE}/api/presets`);
@@ -479,16 +476,15 @@
                     container.appendChild(chip);
                 });
             } catch (e) {
-                console.error("Presets endpoint error:", e);
+                console.error("Presets error:", e);
             }
         }
 
-        // 3. Run Inference Request
         async function runInference() {
             const text = document.getElementById("reviewText").value.trim();
             const model = document.getElementById("modelSelector").value;
 
-            if (!text) return alert("Please enter review text or select a preset!");
+            if (!text) return alert("Please enter review text or click a preset chip!");
 
             try {
                 const res = await fetch(`${API_BASE}/api/analyze`, {
@@ -499,25 +495,21 @@
 
                 const data = await res.json();
 
-                // Render result card
                 document.getElementById("resultCard").style.display = "flex";
                 document.getElementById("resAspect").innerText = data.predicted_aspect;
                 document.getElementById("resDept").innerText = data.target_department;
                 document.getElementById("resUrgency").innerText = data.urgency;
                 document.getElementById("resConfidence").innerText = data.confidence_score;
 
-                // Refresh KPIs & Feed
                 refreshDashboardData();
             } catch (e) {
-                alert("Error connecting to backend API!");
+                alert("Error connecting to FastAPI backend!");
                 console.error(e);
             }
         }
 
-        // 4. Refresh Dashboard Stats and Active Alerts Feed
         async function refreshDashboardData() {
             try {
-                // Fetch KPI Metrics
                 const statsRes = await fetch(`${API_BASE}/api/dashboard-stats`);
                 const statsData = await statsRes.json();
 
@@ -525,7 +517,6 @@
                 document.getElementById("metricAlertRate").innerText = statsData.metrics.actionable_alert_rate_pct;
                 document.getElementById("metricTotal").innerText = statsData.metrics.total_reviews;
 
-                // Fetch Alert Feed
                 const alertsRes = await fetch(`${API_BASE}/api/alerts`);
                 const alertsData = await alertsRes.json();
                 const container = document.getElementById("alertsContainer");
@@ -556,20 +547,13 @@
                     container.innerHTML = html;
                 }
             } catch (e) {
-                console.error("Error refreshing dashboard stats:", e);
+                console.error("Error refreshing dashboard data:", e);
             }
         }
 
-        // Helper: Clear input area
         function clearInference() {
             document.getElementById("reviewText").value = "";
             document.getElementById("resultCard").style.display = "none";
-        }
-
-        // Helper: Tab Switching
-        function switchTab(tabName) {
-            document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
-            event.currentTarget.classList.add("active");
         }
     </script>
 </body>
