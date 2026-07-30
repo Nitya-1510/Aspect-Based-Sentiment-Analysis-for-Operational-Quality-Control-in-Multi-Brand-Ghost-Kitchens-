@@ -3,104 +3,573 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ghost Kitchen ABSA Tester</title>
+    <title>ABSA Framework v2.4.1-stable</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 20px; }
-        textarea { width: 100%; height: 80px; padding: 10px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #218838; }
-        .card { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 5px; }
-        .alert-high { color: red; font-weight: bold; }
-        .alert-medium { color: orange; font-weight: bold; }
-        .alert-low { color: green; font-weight: bold; }
-        pre { background: #eee; padding: 10px; overflow-x: auto; }
+        :root {
+            --bg-color: #f7f4ef;
+            --sidebar-bg: #efebe4;
+            --card-bg: #ffffff;
+            --accent-color: #8c5300;
+            --accent-hover: #704200;
+            --text-primary: #2c2520;
+            --text-secondary: #6e655f;
+            --border-color: #e2dad0;
+            --badge-bg: #f3ebd9;
+            --badge-text: #8c5300;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 15px;
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+
+        .brand-version {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #e4ddd3;
+            font-weight: 600;
+        }
+
+        .btn-new-experiment {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .btn-new-experiment:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Main Dashboard Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header Bar */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            width: 320px;
+        }
+
+        .search-container input {
+            border: none;
+            outline: none;
+            width: 100%;
+            background: transparent;
+            font-size: 0.85rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-badge {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Dashboard Grid Layout */
+        .dashboard-body {
+            padding: 25px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+
+        .kpi-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .kpi-subtext {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        /* Inference Lab Section */
+        .lab-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .lab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lab-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .model-select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Presets Chips Bar */
+        .presets-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .preset-chip {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .preset-chip:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* Text Area & Submit */
+        .review-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #faf8f5;
+            resize: none;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .review-textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-run {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-run:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Prediction Results Display Box */
+        .result-box {
+            background: #faf8f5;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-item span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .result-item strong {
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Ghost Kitchen ABSA - Live Tester</h2>
+    <!-- Left Navigation Sidebar -->
+    <div class="sidebar">
+        <div>
+            <div class="brand-title">ABSA Framework</div>
+            <div class="brand-version" id="sysVersion">v2.4.1-stable</div>
 
-    <!-- Form for submitting review -->
-    <div>
-        <label for="reviewInput"><strong>Enter Review Text:</strong></label>
-        <textarea id="reviewInput" placeholder="e.g. The pizza was freezing cold and took 2 hours to arrive!"></textarea>
-        <button onclick="analyzeReview()">Submit & Analyze</button>
+            <nav class="nav-menu">
+                <a class="nav-item active" onclick="switchTab('command')">💻 Command Center</a>
+                <a class="nav-item" onclick="switchTab('inference')">🧪 Inference Lab</a>
+                <a class="nav-item" onclick="switchTab('department')">🏢 Department View</a>
+            </nav>
+
+            <button class="btn-new-experiment" onclick="clearInference()">+ New Experiment</button>
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+            ⚙️ Settings <br><br>
+            📖 Documentation
+        </div>
     </div>
 
-    <!-- Live Prediction Card -->
-    <div id="predictionCard" class="card" style="display:none;">
-        <h3>Latest Prediction Result</h3>
-        <p><strong>Predicted Aspect:</strong> <span id="resAspect"></span></p>
-        <p><strong>Confidence Score:</strong> <span id="resConfidence"></span></p>
-        <p><strong>Actionable Alert:</strong> <span id="resAlert"></span></p>
-        <p><strong>Target Department:</strong> <span id="resDept"></span></p>
-        <p><strong>Urgency:</strong> <span id="resUrgency"></span></p>
-        <p><strong>Latency:</strong> <span id="resLatency"></span> ms</p>
+    <!-- Main Content Container -->
+    <div class="main-content">
+
+        <!-- Header Bar -->
+        <header class="top-header">
+            <div class="search-container">
+                🔍 <input type="text" placeholder="Search system nodes...">
+            </div>
+
+            <div class="header-actions">
+                <span class="status-badge" id="sysStatus">SYSTEM ONLINE</span>
+                <span>🔔</span>
+                <span style="font-weight:600; font-size: 0.85rem;">Admin User</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Body Content -->
+        <div class="dashboard-body">
+
+            <!-- Top KPI Cards Row -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">System Latency</div>
+                    <div class="kpi-value"><span id="metricLatency">0</span><span style="font-size: 1rem;">ms</span></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Alert Rate</div>
+                    <div class="kpi-value"><span id="metricAlertRate">0.0</span><span style="font-size: 1rem;">%</span></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Reviews</div>
+                    <div class="kpi-value"><span id="metricTotal">0</span> <span class="kpi-subtext">Logged</span></div>
+                </div>
+            </div>
+
+            <!-- Inference Tester Section -->
+            <div class="lab-card">
+                <div class="lab-header">
+                    <div class="lab-title">Inference Tester 🧪</div>
+                    <select class="model-select" id="modelSelector">
+                        <option value="SVM_ABSA_V1">SVM_ABSA_V1</option>
+                        <option value="GPT-4_ABSA_V3">GPT-4_ABSA_V3</option>
+                        <option value="BERT_ABSA_V2">BERT_ABSA_V2</option>
+                    </select>
+                </div>
+
+                <!-- Presets Chips Row -->
+                <div class="presets-bar" id="presetsContainer">
+                    <span style="font-size:0.8rem; color: var(--text-secondary);">Presets:</span>
+                    <!-- Preset chips loaded via JavaScript -->
+                </div>
+
+                <!-- Text Area Input -->
+                <textarea class="review-textarea" id="reviewText" placeholder="Enter customer review text here..."></textarea>
+
+                <div class="action-row">
+                    <button class="btn-run" onclick="runInference()">▶ Run Inference</button>
+                </div>
+
+                <!-- Results Output Card -->
+                <div class="result-box" id="resultCard">
+                    <div style="font-weight: 700; font-size: 0.9rem;">Prediction Outcome</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span>Predicted Aspect</span>
+                            <strong id="resAspect">-</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>Target Department</span>
+                            <strong id="resDept">-</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>Urgency Rating</span>
+                            <strong id="resUrgency">-</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>Confidence Score</span>
+                            <strong id="resConfidence">-</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Section: Alert Feed Table -->
+            <div class="lab-card">
+                <div class="lab-title">Actionable Alert Feed</div>
+                <div id="alertsContainer" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    No actionable alerts dispatched yet. Run an inference above to populate data.
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Dashboard Stats Output -->
-    <div class="card">
-        <h3>Dashboard KPI Stats</h3>
-        <button onclick="fetchDashboardStats()" style="background-color: #007bff;">Refresh Dashboard Stats</button>
-        <pre id="dashboardOutput">Click refresh to load stats...</pre>
-    </div>
-
+    <!-- JavaScript REST Interactivity -->
     <script>
-        const API_URL = "http://127.0.0.1:8000";
+        const API_BASE = "http://127.0.0.1:8000";
 
-        // Endpoint 1: POST /api/analyze
-        async function analyzeReview() {
-            const reviewText = document.getElementById("reviewInput").value.trim();
-            if (!reviewText) return alert("Please enter a review first!");
+        // Initializer on Page Load
+        window.addEventListener("DOMContentLoaded", () => {
+            fetchSystemStatus();
+            fetchPresets();
+            refreshDashboardData();
+        });
 
+        // 1. Fetch System Status
+        async function fetchSystemStatus() {
             try {
-                const response = await fetch(`${API_URL}/api/analyze`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ review: reviewText })
-                });
-
-                const data = await response.json();
-
-                // Display response in UI
-                document.getElementById("predictionCard").style.display = "block";
-                document.getElementById("resAspect").innerText = data.predicted_aspect;
-                document.getElementById("resConfidence").innerText = data.confidence_score;
-                document.getElementById("resAlert").innerText = data.actionable_alert ? "YES" : "NO";
-                document.getElementById("resDept").innerText = data.target_department;
-                document.getElementById("resUrgency").innerText = data.urgency;
-                document.getElementById("resLatency").innerText = data.inference_latency_ms;
-
-                // Color badge based on urgency
-                const urgencyEl = document.getElementById("resUrgency");
-                urgencyEl.className = `alert-${data.urgency.toLowerCase()}`;
-
-                // Auto-refresh dashboard stats
-                fetchDashboardStats();
-            } catch (err) {
-                alert("Error connecting to FastAPI backend!");
-                console.error(err);
+                const res = await fetch(`${API_BASE}/api/system-status`);
+                const data = await res.json();
+                document.getElementById("sysStatus").innerText = data.status;
+                document.getElementById("sysVersion").innerText = data.version;
+            } catch (e) {
+                console.error("System status endpoint error:", e);
             }
         }
 
-        // Endpoint 2 & 3: GET /api/dashboard-stats & /api/alerts
-        async function fetchDashboardStats() {
+        // 2. Fetch Sample Presets
+        async function fetchPresets() {
             try {
-                const statsRes = await fetch(`${API_URL}/api/dashboard-stats`);
+                const res = await fetch(`${API_BASE}/api/presets`);
+                const data = await res.json();
+                const container = document.getElementById("presetsContainer");
+
+                data.presets.forEach(text => {
+                    const chip = document.createElement("div");
+                    chip.className = "preset-chip";
+                    chip.innerText = text.length > 35 ? text.substring(0, 35) + "..." : text;
+                    chip.onclick = () => {
+                        document.getElementById("reviewText").value = text;
+                    };
+                    container.appendChild(chip);
+                });
+            } catch (e) {
+                console.error("Presets endpoint error:", e);
+            }
+        }
+
+        // 3. Run Inference Request
+        async function runInference() {
+            const text = document.getElementById("reviewText").value.trim();
+            const model = document.getElementById("modelSelector").value;
+
+            if (!text) return alert("Please enter review text or select a preset!");
+
+            try {
+                const res = await fetch(`${API_BASE}/api/analyze`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ review: text, selected_model: model })
+                });
+
+                const data = await res.json();
+
+                // Render result card
+                document.getElementById("resultCard").style.display = "flex";
+                document.getElementById("resAspect").innerText = data.predicted_aspect;
+                document.getElementById("resDept").innerText = data.target_department;
+                document.getElementById("resUrgency").innerText = data.urgency;
+                document.getElementById("resConfidence").innerText = data.confidence_score;
+
+                // Refresh KPIs & Feed
+                refreshDashboardData();
+            } catch (e) {
+                alert("Error connecting to backend API!");
+                console.error(e);
+            }
+        }
+
+        // 4. Refresh Dashboard Stats and Active Alerts Feed
+        async function refreshDashboardData() {
+            try {
+                // Fetch KPI Metrics
+                const statsRes = await fetch(`${API_BASE}/api/dashboard-stats`);
                 const statsData = await statsRes.json();
 
-                const alertsRes = await fetch(`${API_URL}/api/alerts`);
+                document.getElementById("metricLatency").innerText = statsData.metrics.avg_latency_ms;
+                document.getElementById("metricAlertRate").innerText = statsData.metrics.actionable_alert_rate_pct;
+                document.getElementById("metricTotal").innerText = statsData.metrics.total_reviews;
+
+                // Fetch Alert Feed
+                const alertsRes = await fetch(`${API_BASE}/api/alerts`);
                 const alertsData = await alertsRes.json();
+                const container = document.getElementById("alertsContainer");
 
-                const combined = {
-                    dashboard_stats: statsData,
-                    recent_alerts: alertsData
-                };
+                if (alertsData.alerts.length === 0) {
+                    container.innerText = "No actionable alerts dispatched yet.";
+                } else {
+                    let html = `<table style="width:100%; border-collapse:collapse; text-align:left;">
+                        <tr style="border-bottom:1px solid var(--border-color); font-weight:bold;">
+                            <th style="padding:8px;">ID</th>
+                            <th style="padding:8px;">Aspect</th>
+                            <th style="padding:8px;">Department</th>
+                            <th style="padding:8px;">Urgency</th>
+                            <th style="padding:8px;">Snippet</th>
+                        </tr>`;
 
-                document.getElementById("dashboardOutput").innerText = JSON.stringify(combined, null, 2);
-            } catch (err) {
-                console.error("Failed to load dashboard stats:", err);
+                    alertsData.alerts.forEach(a => {
+                        html += `<tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:8px;">#${a.id}</td>
+                            <td style="padding:8px;">${a.primary_aspect}</td>
+                            <td style="padding:8px;">${a.target_department}</td>
+                            <td style="padding:8px; font-weight:bold; color:${a.urgency === 'High' ? 'red' : 'orange'}">${a.urgency}</td>
+                            <td style="padding:8px;">${a.review_snippet}</td>
+                        </tr>`;
+                    });
+
+                    html += `</table>`;
+                    container.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Error refreshing dashboard stats:", e);
             }
+        }
+
+        // Helper: Clear input area
+        function clearInference() {
+            document.getElementById("reviewText").value = "";
+            document.getElementById("resultCard").style.display = "none";
+        }
+
+        // Helper: Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+            event.currentTarget.classList.add("active");
         }
     </script>
 </body>
