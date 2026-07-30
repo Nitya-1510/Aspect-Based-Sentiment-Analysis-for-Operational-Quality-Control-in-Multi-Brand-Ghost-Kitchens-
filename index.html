@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABSA Framework v2.4.1-stable</title>
+    <!-- Chart.js CDN for Department View Bar Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #f7f4ef;
@@ -94,10 +96,6 @@
             transition: background 0.2s;
         }
 
-        .btn-new-experiment:hover {
-            background-color: var(--accent-hover);
-        }
-
         /* Main Dashboard Content Area */
         .main-content {
             flex: 1;
@@ -116,46 +114,22 @@
             background-color: var(--bg-color);
         }
 
-        .search-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--card-bg);
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            width: 320px;
-        }
-
-        .search-container input {
-            border: none;
-            outline: none;
-            width: 100%;
-            background: transparent;
-            font-size: 0.85rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .status-badge {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* Dashboard Grid Layout */
         .dashboard-body {
             padding: 25px 30px;
             display: flex;
             flex-direction: column;
             gap: 20px;
+        }
+
+        /* Tab Display Logic */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
         }
 
         .kpi-row {
@@ -188,12 +162,6 @@
             gap: 8px;
         }
 
-        .kpi-subtext {
-            font-size: 0.8rem;
-            color: var(--accent-color);
-        }
-
-        /* Inference Lab Section */
         .lab-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -204,27 +172,11 @@
             gap: 15px;
         }
 
-        .lab-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .lab-title {
             font-size: 1.1rem;
             font-weight: 700;
         }
 
-        .model-select {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* Presets Chips Bar */
         .presets-bar {
             display: flex;
             align-items: center;
@@ -242,14 +194,8 @@
             white-space: nowrap;
             cursor: pointer;
             border: 1px solid transparent;
-            transition: all 0.2s;
         }
 
-        .preset-chip:hover {
-            border-color: var(--accent-color);
-        }
-
-        /* Text Area & Submit */
         .review-textarea {
             width: 100%;
             height: 100px;
@@ -262,15 +208,6 @@
             outline: none;
         }
 
-        .review-textarea:focus {
-            border-color: var(--accent-color);
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: flex-end;
-        }
-
         .btn-run {
             background-color: var(--accent-color);
             color: white;
@@ -279,45 +216,90 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            align-self: flex-end;
         }
 
-        .btn-run:hover {
-            background-color: var(--accent-hover);
-        }
-
-        /* Prediction Results Display Box */
-        .result-box {
-            background: #faf8f5;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 15px;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .result-grid {
+        /* HEAT MAP GRID STYLING FOR DEPARTMENTS */
+        .heatmap-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 15px;
             margin-top: 5px;
         }
 
-        .result-item {
+        .heatmap-dept-card {
+            background: #faf8f5;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .result-item span {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .heatmap-dept-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
         }
 
-        .result-item strong {
-            font-size: 0.95rem;
+        .heatmap-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .heatmap-bars {
+            display: flex;
+            gap: 10px;
+        }
+
+        .heat-badge {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .heat-badge span {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .heat-badge strong {
+            font-size: 1.2rem;
+        }
+
+        /* Complaint Cards Grid */
+        .complaints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .complaint-card {
+            background: #faf8f5;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .complaint-card.High {
+            border-left-color: #d32f2f;
+        }
+
+        .complaint-card.Medium {
+            border-left-color: #ed6c02;
         }
     </style>
 </head>
@@ -330,134 +312,110 @@
             <div class="brand-version" id="sysVersion">v2.4.1-stable</div>
 
             <nav class="nav-menu">
-                <a class="nav-item active">💻 Command Center</a>
-                <a class="nav-item">🧪 Inference Lab</a>
-                <a class="nav-item">🏢 Department View</a>
+                <a class="nav-item active" onclick="switchTab('command', this)">💻 Command Center</a>
+                <a class="nav-item" onclick="switchTab('department', this)">🏢 Department View</a>
             </nav>
 
             <button class="btn-new-experiment" onclick="clearInference()">+ New Experiment</button>
-        </div>
-
-        <div style="font-size: 0.8rem; color: var(--text-secondary);">
-            ⚙️ Settings <br><br>
-            📖 Documentation
         </div>
     </div>
 
     <!-- Main Content Container -->
     <div class="main-content">
-
-        <!-- Header Bar -->
         <header class="top-header">
-            <div class="search-container">
-                🔍 <input type="text" placeholder="Search system nodes...">
-            </div>
-
-            <div class="header-actions">
-                <span class="status-badge" id="sysStatus">SYSTEM ONLINE</span>
-                <span>🔔</span>
-                <span style="font-weight:600; font-size: 0.85rem;">Admin User</span>
-            </div>
+            <span style="font-weight:700; font-size:1.1rem;">Ghost Kitchen Analytics Platform</span>
+            <span id="sysStatus" style="background:#e8f5e9; color:#2e7d32; padding:4px 10px; border-radius:12px; font-weight:bold; font-size:0.8rem;">SYSTEM ONLINE</span>
         </header>
 
-        <!-- Dashboard Body Content -->
         <div class="dashboard-body">
 
-            <!-- Top KPI Cards Row -->
-            <div class="kpi-row">
-                <div class="kpi-card">
-                    <div class="kpi-label">System Latency</div>
-                    <div class="kpi-value"><span id="metricLatency">0</span><span style="font-size: 1rem;">ms</span></div>
+            <!-- TAB 1: Command Center -->
+            <div id="tab-command" class="tab-content active">
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-label">System Latency</div>
+                        <div class="kpi-value"><span id="metricLatency">0</span><span style="font-size: 1rem;">ms</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Alert Rate</div>
+                        <div class="kpi-value"><span id="metricAlertRate">0.0</span><span style="font-size: 1rem;">%</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Reviews</div>
+                        <div class="kpi-value"><span id="metricTotal">0</span></div>
+                    </div>
                 </div>
 
-                <div class="kpi-card">
-                    <div class="kpi-label">Alert Rate</div>
-                    <div class="kpi-value"><span id="metricAlertRate">0.0</span><span style="font-size: 1rem;">%</span></div>
-                </div>
-
-                <div class="kpi-card">
-                    <div class="kpi-label">Total Reviews</div>
-                    <div class="kpi-value"><span id="metricTotal">0</span> <span class="kpi-subtext">Logged</span></div>
-                </div>
-            </div>
-
-            <!-- Inference Tester Section -->
-            <div class="lab-card">
-                <div class="lab-header">
+                <div class="lab-card">
                     <div class="lab-title">Inference Tester 🧪</div>
-                    <select class="model-select" id="modelSelector">
-                        <option value="SVM_ABSA_V1">SVM_ABSA_V1</option>
-                        <option value="GPT-4_ABSA_V3">GPT-4_ABSA_V3</option>
-                        <option value="BERT_ABSA_V2">BERT_ABSA_V2</option>
-                    </select>
-                </div>
-
-                <!-- Presets Chips Row -->
-                <div class="presets-bar" id="presetsContainer">
-                    <span style="font-size:0.8rem; color: var(--text-secondary);">Presets:</span>
-                </div>
-
-                <!-- Text Area Input -->
-                <textarea class="review-textarea" id="reviewText" placeholder="Enter customer review text here..."></textarea>
-
-                <div class="action-row">
+                    <div class="presets-bar" id="presetsContainer">
+                        <span style="font-size:0.8rem; color: var(--text-secondary);">Presets:</span>
+                    </div>
+                    <textarea class="review-textarea" id="reviewText" placeholder="Type customer review here..."></textarea>
                     <button class="btn-run" onclick="runInference()">▶ Run Inference</button>
                 </div>
 
-                <!-- Results Output Card -->
-                <div class="result-box" id="resultCard">
-                    <div style="font-weight: 700; font-size: 0.9rem;">Prediction Outcome</div>
-                    <div class="result-grid">
-                        <div class="result-item">
-                            <span>Predicted Aspect</span>
-                            <strong id="resAspect">-</strong>
-                        </div>
-                        <div class="result-item">
-                            <span>Target Department</span>
-                            <strong id="resDept">-</strong>
-                        </div>
-                        <div class="result-item">
-                            <span>Urgency Rating</span>
-                            <strong id="resUrgency">-</strong>
-                        </div>
-                        <div class="result-item">
-                            <span>Confidence Score</span>
-                            <strong id="resConfidence">-</strong>
-                        </div>
+                <div class="lab-card">
+                    <div class="lab-title">Actionable Alert Feed</div>
+                    <div id="alertsContainer" style="font-size: 0.85rem; color: var(--text-secondary);">
+                        No actionable alerts dispatched yet.
                     </div>
                 </div>
             </div>
 
-            <!-- Dynamic Section: Alert Feed Table -->
-            <div class="lab-card">
-                <div class="lab-title">Actionable Alert Feed</div>
-                <div id="alertsContainer" style="font-size: 0.85rem; color: var(--text-secondary);">
-                    No actionable alerts dispatched yet. Run an inference above to populate data.
+            <!-- TAB 2: Department View (Urgency Heat Map + Bar Chart + Complaints) -->
+            <div id="tab-department" class="tab-content">
+
+                <!-- NEW: Department Urgency Heat Map -->
+                <div class="lab-card">
+                    <div class="lab-title">Department Urgency Heat Map</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                        Live breakdown of High (Critical) and Medium priority complaints mapped per operational department.
+                    </p>
+                    <div class="heatmap-grid" id="departmentHeatmap">
+                        <!-- Dynamic Heat Map Cards will load here -->
+                    </div>
+                </div>
+
+                <!-- Department Distribution Bar Chart -->
+                <div class="lab-card">
+                    <div class="lab-title">Department Distribution Chart</div>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="deptChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Complaints Cards Box -->
+                <div class="lab-card">
+                    <div class="lab-title">
+                        Complaints Box: <span id="selectedDeptName" style="color: var(--accent-color);">All Departments</span>
+                    </div>
+                    <div class="complaints-grid" id="complaintsContainer"></div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- JavaScript REST Interactivity -->
+    <!-- JavaScript Interactivity -->
     <script>
         const API_BASE = window.location.origin;
+        let chartInstance = null;
+        let selectedDepartmentFilter = null;
 
         window.addEventListener("DOMContentLoaded", () => {
-            fetchSystemStatus();
             fetchPresets();
             refreshDashboardData();
         });
 
-        async function fetchSystemStatus() {
-            try {
-                const res = await fetch(`${API_BASE}/api/system-status`);
-                const data = await res.json();
-                document.getElementById("sysStatus").innerText = data.status;
-                document.getElementById("sysVersion").innerText = data.version;
-            } catch (e) {
-                console.error("System status error:", e);
-            }
+        function switchTab(tabName, el) {
+            document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+
+            el.classList.add("active");
+            document.getElementById(`tab-${tabName}`).classList.add("active");
+
+            if (tabName === 'department') loadDepartmentView();
         }
 
         async function fetchPresets() {
@@ -470,42 +428,27 @@
                     const chip = document.createElement("div");
                     chip.className = "preset-chip";
                     chip.innerText = text.length > 35 ? text.substring(0, 35) + "..." : text;
-                    chip.onclick = () => {
-                        document.getElementById("reviewText").value = text;
-                    };
+                    chip.onclick = () => { document.getElementById("reviewText").value = text; };
                     container.appendChild(chip);
                 });
-            } catch (e) {
-                console.error("Presets error:", e);
-            }
+            } catch (e) { console.error("Presets error:", e); }
         }
 
         async function runInference() {
             const text = document.getElementById("reviewText").value.trim();
-            const model = document.getElementById("modelSelector").value;
-
-            if (!text) return alert("Please enter review text or click a preset chip!");
+            if (!text) return alert("Please enter review text!");
 
             try {
-                const res = await fetch(`${API_BASE}/api/analyze`, {
+                await fetch(`${API_BASE}/api/analyze`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ review: text, selected_model: model })
+                    body: JSON.stringify({ review: text })
                 });
 
-                const data = await res.json();
-
-                document.getElementById("resultCard").style.display = "flex";
-                document.getElementById("resAspect").innerText = data.predicted_aspect;
-                document.getElementById("resDept").innerText = data.target_department;
-                document.getElementById("resUrgency").innerText = data.urgency;
-                document.getElementById("resConfidence").innerText = data.confidence_score;
-
+                document.getElementById("reviewText").value = "";
+                alert("Review submitted & processed!");
                 refreshDashboardData();
-            } catch (e) {
-                alert("Error connecting to FastAPI backend!");
-                console.error(e);
-            }
+            } catch (e) { alert("Error connecting to server!"); }
         }
 
         async function refreshDashboardData() {
@@ -546,14 +489,128 @@
                     html += `</table>`;
                     container.innerHTML = html;
                 }
-            } catch (e) {
-                console.error("Error refreshing dashboard data:", e);
-            }
+            } catch (e) { console.error(e); }
+        }
+
+        /* DEPARTMENT VIEW & HEAT MAP RENDERER */
+        async function loadDepartmentView() {
+            try {
+                // 1. Fetch Department Breakdown Data
+                const deptRes = await fetch(`${API_BASE}/api/department-view`);
+                const deptData = await deptRes.json();
+                const departments = deptData.departments;
+
+                // Render Heat Map Grid
+                renderUrgencyHeatmap(departments);
+
+                // Render Bar Chart
+                const labels = departments.map(d => d.department);
+                const counts = departments.map(d => d.active_alerts);
+
+                const ctx = document.getElementById('deptChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Active Alerts',
+                            data: counts,
+                            backgroundColor: '#8c5300',
+                            borderColor: '#704200',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const clickedDept = labels[elements[0].index];
+                                selectedDepartmentFilter = clickedDept;
+                                renderComplaintsBox(clickedDept);
+                            }
+                        },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
+
+                renderComplaintsBox(selectedDepartmentFilter);
+            } catch (e) { console.error("Error loading department view:", e); }
+        }
+
+        function renderUrgencyHeatmap(departments) {
+            const container = document.getElementById("departmentHeatmap");
+            let html = "";
+
+            departments.forEach(dept => {
+                // Determine Heat map color intensity based on high/medium alert counts
+                const highOpacity = Math.min(1, dept.high_urgency * 0.35 + 0.1);
+                const medOpacity = Math.min(1, dept.medium_urgency * 0.35 + 0.1);
+
+                const highBg = dept.high_urgency > 0 ? `rgba(211, 47, 47, ${highOpacity})` : '#f0f0f0';
+                const highText = dept.high_urgency > 0 && highOpacity > 0.5 ? '#ffffff' : '#2c2520';
+
+                const medBg = dept.medium_urgency > 0 ? `rgba(237, 108, 2, ${medOpacity})` : '#f0f0f0';
+                const medText = dept.medium_urgency > 0 && medOpacity > 0.5 ? '#ffffff' : '#2c2520';
+
+                html += `
+                    <div class="heatmap-dept-card" onclick="selectedDepartmentFilter='${dept.department}'; renderComplaintsBox('${dept.department}');">
+                        <div class="heatmap-title">${dept.department}</div>
+                        <div class="heatmap-bars">
+                            <div class="heat-badge" style="background-color:${highBg}; color:${highText};">
+                                <span>High</span>
+                                <strong>${dept.high_urgency}</strong>
+                            </div>
+                            <div class="heat-badge" style="background-color:${medBg}; color:${medText};">
+                                <span>Medium</span>
+                                <strong>${dept.medium_urgency}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function renderComplaintsBox(deptFilter) {
+            document.getElementById("selectedDeptName").innerText = deptFilter ? deptFilter : "All Departments";
+            const container = document.getElementById("complaintsContainer");
+
+            try {
+                const alertsRes = await fetch(`${API_BASE}/api/alerts`);
+                const alertsData = await alertsRes.json();
+
+                let filtered = alertsData.alerts;
+                if (deptFilter) filtered = filtered.filter(a => a.target_department === deptFilter);
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `<p style="font-size:0.85rem; color: var(--text-secondary);">No complaints logged for this department yet.</p>`;
+                    return;
+                }
+
+                let html = "";
+                filtered.forEach(a => {
+                    html += `
+                        <div class="complaint-card ${a.urgency}">
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary);">
+                                <span>#${a.id} • ${a.primary_aspect}</span>
+                                <span style="font-weight:bold; color:${a.urgency === 'High' ? 'red' : 'orange'}">${a.urgency} Urgency</span>
+                            </div>
+                            <div style="font-size:0.9rem; margin:6px 0;">"${a.review_snippet}"</div>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);">Target: <strong>${a.target_department}</strong></div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (e) { console.error(e); }
         }
 
         function clearInference() {
             document.getElementById("reviewText").value = "";
-            document.getElementById("resultCard").style.display = "none";
         }
     </script>
 </body>

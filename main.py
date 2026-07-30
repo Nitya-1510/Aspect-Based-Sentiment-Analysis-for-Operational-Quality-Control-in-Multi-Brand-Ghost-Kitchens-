@@ -31,15 +31,32 @@ app.add_middleware(
 vectorizer = joblib.load(BASE_DIR / "vectorizer.joblib")
 model = joblib.load(BASE_DIR / "svm_model.joblib")
 
-# In-memory runtime data store for review processing logs
-REVIEWS_DB = []
-
 # Preset review chips for rapid UI testing inside the Inference Tester card
 PRESETS = [
     "The salmon was perfectly seared but the delivery driver left the gate open.",
     "The battery life is stellar but packaging was damaged.",
     "Cold packaging was crushed and soup spilled.",
     "Food arrived hot and fresh on time."
+]
+
+# In-memory runtime data store pre-populated with sample processed logs
+# This guarantees your Chart.js Bar Chart renders instantly on first load!
+REVIEWS_DB = [
+    # High Urgency (triggers 'raw' keyword rule) -> RED badge
+    process_review_for_prediction_card(
+        "The chicken was completely raw in the middle!",
+        vectorizer, model
+    ),
+    # Medium Urgency (mild complaint without critical keywords) -> ORANGE badge
+    process_review_for_prediction_card(
+        "The fries were soggy and lukewarm, and the burger missed the extra cheese.",
+        vectorizer, model
+    ),
+    # Medium Urgency
+    process_review_for_prediction_card(
+        "Driver took a wrong turn and arrived 15 minutes late.",
+        vectorizer, model
+    )
 ]
 
 
