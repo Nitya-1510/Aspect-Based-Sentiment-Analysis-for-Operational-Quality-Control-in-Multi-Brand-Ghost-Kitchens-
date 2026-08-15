@@ -1,0 +1,51 @@
+raw_review,true_aspect
+"The chicken tikka was completely raw and cold inside!",Culinary_Execution
+"The fries were soggy lukewarm and missed the extra cheese.",Culinary_Execution
+"The soup container was completely crushed and spilled in the bag.",Packaging_Integrity
+"The box arrived smashed and all the curry leaked out.",Packaging_Integrity
+"Delivery took over 2 hours and driver got lost twice.",Logistics_Distribution
+"Food arrived freezing cold and the delivery driver was rude.",Logistics_Distribution
+"The steak was cooked to absolute perfection and very juicy.",Culinary_Execution
+"Containers were wrapped tightly with zero leaks or spills.",Packaging_Integrity
+"Driver dropped the package at the wrong apartment door.",Logistics_Distribution
+"The burger patty was burnt to a crisp and unpalatable.",Culinary_Execution
+"The cardboard box collapsed under the weight of the noodles.",Packaging_Integrity
+"Rider brought the order in 15 minutes fresh and hot.",Logistics_Distribution
+"Paneer butter masala tasted stale and sour.",Culinary_Execution
+"Plastic lid cracked during transit leaking sauce everywhere.",Packaging_Integrity
+"Driver left the food outside in the rain without calling.",Logistics_Distribution
+"The naan was soft warm and perfectly buttered.",Culinary_Execution
+"Eco-friendly packaging kept everything crisp and separated.",Packaging_Integrity
+"Delivery executive took a wrong turn delaying the food by 40 mins.",Logistics_Distribution
+"The pasta was extremely salty and completely inedible.",Culinary_Execution
+"Foil wrap was torn and grease soaked through the paper bag.",Packaging_Integrity
+"Order status showed delivered 30 minutes before it actually arrived.",Logistics_Distribution
+"Fish curry was rich aromatic and cooked impeccably.",Culinary_Execution
+"Drink cup melted and spilled cold coffee all over the snacks.",Packaging_Integrity
+"Driver followed all gate instructions perfectly.",Logistics_Distribution
+"Biryani rice was undercooked and hard to chew.",Culinary_Execution
+"Sealing tape was tampered with on arrival.",Packaging_Integrity
+"Live tracking stopped updating and delivery was heavily delayed.",Logistics_Distribution
+"Garlic bread was crispy on the outside and fluffy inside.",Culinary_Execution
+"Salad box was crushed flattening all the ingredients.",Packaging_Integrity
+"Driver was super polite and delivered directly to the 4th floor.",Logistics_Distribution
+"Soup had no flavor at all and tasted like warm plain water.",Culinary_Execution
+"Gravy container lid popped open inside the thermal bag.",Packaging_Integrity
+"Order was handed to the wrong person in the lobby.",Logistics_Distribution
+"The pizza crust was completely black and charred.",Culinary_Execution
+"Sturdy double-walled boxes kept the dumplings piping hot.",Packaging_Integrity
+"Delivery agent refused to come up to the apartment.",Logistics_Distribution
+"Momos were doughy and meat filling was undercooked.",Culinary_Execution
+"Paper bag handle ripped off dropping the contents on the floor.",Packaging_Integrity
+"Express delivery arrived in less than 20 minutes.",Logistics_Distribution
+"Dessert was missing key ingredients promised on the menu.",Culinary_Execution
+"Lids were secured tightly with tamper-evident safety seals.",Packaging_Integrity
+"Driver drove recklessly and spilled the contents inside his bag.",Logistics_Distribution
+"The grilled salmon was dry tough and overcooked.",Culinary_Execution
+"Bento box compartments kept hot and cold items completely separate.",Packaging_Integrity
+"Delivery status showed canceled even though food was on the way.",Logistics_Distribution
+"Tacos were soggy because salsa was poured directly on top.",Culinary_Execution
+"Condiment tubs were missing from the package entirely.",Packaging_Integrity
+"Delivery person was very courteous and brought proper change.",Logistics_Distribution
+"Chocolate lava cake was warm melted and delicious.",Culinary_Execution
+"Package was soaked in oil due to poor container seal.",Packaging_Integrity

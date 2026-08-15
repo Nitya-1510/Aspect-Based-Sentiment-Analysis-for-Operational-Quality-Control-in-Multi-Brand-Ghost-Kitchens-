@@ -4,8 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import joblib
+from logic.accuracy_evaluator import evaluate_test_dataset
 
 # Determine absolute path to the project root directory
+
 BASE_DIR = Path(__file__).resolve().parent
 
 # Import modularized backend logic components
@@ -128,6 +130,11 @@ def get_alert_feed():
     alert_list = filter_alert_feed_table(REVIEWS_DB)
     return {"alerts": alert_list, "total": len(alert_list)}
 
+#end point 7
+@app.get("/api/evaluate-accuracy")
+def get_accuracy_evaluation():
+    dataset_path = BASE_DIR / "test_dataset.csv"
+    return evaluate_test_dataset(dataset_path, vectorizer, model)
 
 if __name__ == "__main__":
     import uvicorn
